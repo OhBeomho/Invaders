@@ -1,0 +1,83 @@
+@import url("../fonts/PressStart2P.ttf");
+
+* {
+	font-family: "PressStart2P", cursive;
+}
+
+html,
+body {
+	margin: 0;
+}
+
+body {
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
+}
+
+.intro,
+main {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+main {
+	display: none;
+}
+
+.intro h1 {
+	text-transform: uppercase;
+}
+
+.keys-div,
+.how-div,
+.leaderboard-div {
+	display: none;
+	line-height: 150%;
+	margin-top: 50px;
+}
+
+.leaderboard-div {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+button {
+	all: unset;
+	padding: 8px;
+	user-select: none;
+	position: relative;
+}
+
+.intro button {
+	opacity: 0;
+	z-index: -100;
+}
+
+button:hover {
+	background-color: black;
+	color: white;
+}
+
+button:active {
+	translate: 2px 2px;
+}
+
+canvas {
+	background-color: black;
+}
+
+footer {
+	background-color: rgb(240, 240, 240);
+	color: gray;
+	text-align: center;
+	font-size: 14px;
+	padding: 10px 0;
+	opacity: 0;
+	line-height: 150%;
+}

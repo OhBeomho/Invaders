@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" href="css/style.css" />
+		<title>Invaders</title>
+	</head>
+	<body>
+		<div class="intro">
+			<h1>INVADERS</h1>
+			<div style="display: flex; flex-direction: column; justify-content: center; align-items: center">
+				<button id="start">Start</button><br />
+				<button id="keys">Keys</button>
+				<button id="how">How To Play</button><br />
+				<button id="leaderboard">Leaderboard</button>
+			</div>
+			<div class="keys-div">
+				<h2>Keys</h2>
+				Move: A, D or Arrow Left, Right<br />
+				Shoot: Space<br />
+				Shield: S
+			</div>
+			<div class="how-div">
+				<h2>How to play</h2>
+				Defeat the invaders before they come to you!<br />
+				You can use shield for blocking their attack.<br />
+				<br />
+
+				If you are attacked by invaders<br />
+				or they go to the bottom of screen:<br />
+				<span style="color: red">Life - 1</span> and short <span style="color: skyblue">invincible time.</span>
+				<br />
+				<br />
+
+				If you defeated an invader: <span style="color: rgb(204, 204, 0)">Score + 100</span>
+			</div>
+			<div class="leaderboard-div">
+				<h2>Top 20 Players</h2>
+				<ol></ol>
+				<div class="rank"></div>
+				<button id="delete">Delete record</button>
+			</div>
+		</div>
+		<main>
+			<canvas width="600" height="450"></canvas>
+		</main>
+		<footer>
+			Made by OhBeomho<br />
+			Source on <a href="https://github.com/OhBeomho/Invaders">Github</a>.
+		</footer>
+
+		<script>
+			const introText = document.querySelector(".intro h1");
+			const introTextContent = introText.innerText.normalize("NFKD");
+			introText.innerHTML = "";
+
+			const introButtons = document.querySelectorAll(".intro button");
+
+			function intro() {
+				for (let i = 0; i < introTextContent.length; i++) {
+					setTimeout(() => (introText.innerText += introTextContent[i]), i * 100);
+				}
+
+				setTimeout(() => {
+					document.querySelector("footer").style.opacity = 1;
+
+					for (let button of introButtons) {
+						button.style.opacity = button.style.zIndex = 1;
+					}
+				}, introTextContent.length * 100 + 800);
+			}
+
+			setTimeout(intro, 700);
+
+			const keysButton = document.getElementById("keys"),
+				howButton = document.getElementById("how"),
+				leaderboardButton = document.getElementById("leaderboard"),
+				deleteButton = document.getElementById("delete");
+			const keysDiv = document.querySelector(".keys-div"),
+				howDiv = document.querySelector(".how-div"),
+				leaderboardDiv = document.querySelector(".leaderboard-div");
+			const leaderboard = leaderboardDiv.querySelector("ol");
+
+			let currentUsername;
+
+			keysButton.addEventListener("click", () => {
+				const visible = keysDiv.style.display === "block";
+
+				if (!visible) {
+					keysDiv.style.display = "block";
+					howDiv.style.display = "none";
+					leaderboardDiv.style.display = "none";
+				} else {
+					keysDiv.style.display = "none";
+				}
+			});
+			howButton.addEventListener("click", () => {
+				const visible = howDiv.style.display === "block";
+
+				if (!visible) {
+					howDiv.style.display = "block";
+					keysDiv.style.display = "none";
+					leaderboardDiv.style.display = "none";
+				} else {
+					howDiv.style.display = "none";
+				}
+			});
+			leaderboardButton.addEventListener("click", () => {
+				const visible = leaderboardDiv.style.display === "block";
+				if (visible) {
+					leaderboardDiv.style.display = "none";
+					return;
+				}
+
+				const xhr = new XMLHttpRequest();
+				xhr.open("POST", "/top", true);
+				xhr.setRequestHeader("Content-Type", "application/json");
+
+				const username = prompt("Enter your username");
+				if (!username) {
+					alert("Please enter your username.");
+					return;
+				}
+				xhr.send(JSON.stringify({ username }));
+
+				xhr.onreadystatechange = () => {
+					if (xhr.readyState === 4 && xhr.status === 200) {
+						const response = JSON.parse(xhr.response);
+						const { top20, rank, error } = response;
+
+						if (error) {
+							alert("An error occurred while getting data.");
+							return;
+						}
+
+						leaderboard.innerHTML = "";
+
+						for (let user of top20) {
+							const userDiv = document.createElement("li");
+							userDiv.innerText = `${user.username}: ${user.score}`;
+							leaderboard.appendChild(userDiv);
+						}
+
+						document.querySelector(".leaderboard-div .rank").innerText = "Your rank: " + rank;
+
+						leaderboardDiv.style.display = "block";
+						howDiv.style.display = "none";
+						keysDiv.style.display = "none";
+
+						currentUsername = username;
+					}
+				};
+			});
+			deleteButton.addEventListener("click", () => {
+				const xhr = new XMLHttpRequest();
+				xhr.open("POST", "/delete", true);
+				xhr.setRequestHeader("Content-Type", "application/json");
+
+				const password = prompt("Enter your password");
+				if (!password) {
+					alert("Please enter your password");
+					return;
+				}
+
+				xhr.send(JSON.stringify({ username: currentUsername, password }));
+
+				xhr.onreadystatechange = () => {
+					if (xhr.readyState === 4 && xhr.status === 200) {
+						const response = JSON.parse(xhr.response);
+						const { result } = response;
+
+						if (result === "SUCCESS") {
+							alert("Successfully deleted your record.");
+							location.reload();
+						} else if (result === "INVALID_PASSWORD") {
+							alert("Password is incorrect.");
+						} else if (result === "ERROR") {
+							alert("An error occurred while deleting your record.");
+						}
+					}
+				};
+			});
+		</script>
+		<script src="js/game.js"></script>
+	</body>
+</html>
