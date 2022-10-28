@@ -108,7 +108,7 @@
 				}
 			});
 			leaderboardButton.addEventListener("click", () => {
-				const visible = leaderboardDiv.style.display === "block";
+				const visible = leaderboardDiv.style.display === "flex";
 				if (visible) {
 					leaderboardDiv.style.display = "none";
 					return;
@@ -145,7 +145,7 @@
 
 						document.querySelector(".leaderboard-div .rank").innerText = "Your rank: " + rank;
 
-						leaderboardDiv.style.display = "block";
+						leaderboardDiv.style.display = "flex";
 						howDiv.style.display = "none";
 						keysDiv.style.display = "none";
 
@@ -178,6 +178,8 @@
 							alert("Password is incorrect.");
 						} else if (result === "ERROR") {
 							alert("An error occurred while deleting your record.");
+						} else if (result === "UNRANKED") {
+							alert("You didn't saved your record before.");
 						}
 					}
 				};

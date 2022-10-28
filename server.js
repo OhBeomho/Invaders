@@ -85,19 +85,24 @@ app.post("/delete", (req, res) => {
 			return;
 		}
 
-		if (row.password !== password) {
-			res.send(JSON.stringify({ result: "INVALID_PASSWORD" }));
-			return;
-		} else {
-			db.run(`DELETE FROM leaderboard WHERE username='${username}'`, (err) => {
-				if (err) {
-					res.send(JSON.stringify({ result: "ERROR" }));
-					return;
-				}
-
-				res.send(JSON.stringify({ result: "SUCCESS" }));
+		if (row) {
+			if (row.password !== password) {
+				res.send(JSON.stringify({ result: "INVALID_PASSWORD" }));
 				return;
-			});
+			} else {
+				db.run(`DELETE FROM leaderboard WHERE username='${username}'`, (err) => {
+					if (err) {
+						res.send(JSON.stringify({ result: "ERROR" }));
+						return;
+					}
+
+					res.send(JSON.stringify({ result: "SUCCESS" }));
+					return;
+				});
+			}
+		} else {
+			res.send(JSON.stringify({ result: "UNRANKED" }));
+			return;
 		}
 	});
 });
