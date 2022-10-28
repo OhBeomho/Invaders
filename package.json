@@ -1,7 +1,7 @@
 {
   "name": "invaders",
   "version": "1.0.0",
-  "description": "This game is just made for practice coding.  \r **❌ No mobile supports!**",
+  "description": "",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
