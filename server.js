@@ -3,8 +3,8 @@ const app = express();
 const http = require("http");
 const server = http.createServer(app);
 
-const sqlite = require("sqlite3");
-const db = new sqlite.Database("db/record.db", sqlite.OPEN_READWRITE, (err) => {
+const sqlite = require("sqlite3").verbose();
+const db = new sqlite.Database(":memory:", sqlite.OPEN_READWRITE, (err) => {
 	if (err) {
 		console.error(err.message);
 		return;
@@ -71,9 +71,11 @@ app.post("/top", (req, res) => {
 		}
 
 		const top20 = rows.length > 20 ? rows.splice(0, 20) : rows;
-		const rank = rows.indexOf(rows.find((row) => row.username === username)) + 1;
 
-		res.send(JSON.stringify({ top20, rank: rank || "Unranked" }));
+		const me = rows.find((row) => row.username === username);
+		const rank = rows.indexOf(me) + 1;
+
+		res.send(JSON.stringify({ top20, rank: rank || "Unranked", score: me?.score || 0 }));
 	});
 });
 app.post("/delete", (req, res) => {

@@ -124,7 +124,7 @@
 				xhr.onreadystatechange = () => {
 					if (xhr.readyState === 4 && xhr.status === 200) {
 						const response = JSON.parse(xhr.response);
-						const { top20, rank, error } = response;
+						const { top20, rank, score, error } = response;
 
 						if (error) {
 							alert("An error occurred while getting data.");
@@ -139,7 +139,7 @@
 							leaderboard.appendChild(userDiv);
 						}
 
-						document.querySelector(".leaderboard-div .rank").innerText = "Your rank: " + rank;
+						document.querySelector(".leaderboard-div .rank").innerHTML = `Your score: ${score}<br />Your rank: ${rank}`;
 
 						leaderboardDiv.style.display = "flex";
 						howDiv.style.display = "none";
