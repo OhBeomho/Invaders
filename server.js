@@ -6,7 +6,7 @@ const server = http.createServer(app);
 require("dotenv").config();
 
 const { Client } = require("pg");
-const { DB_HOST, DB_USER, DB_PASSWORD, DB_URL } = process.env;
+const {  DB_URL } = process.env;
 const db = new Client(DB_URL);
 db.connect((err) => {
 	if (err) {
