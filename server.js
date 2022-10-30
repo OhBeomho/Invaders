@@ -12,6 +12,8 @@ const db = new sqlite.Database(":memory:", sqlite.OPEN_READWRITE, (err) => {
 
 	console.log("Connected to database.");
 	db.run("CREATE TABLE IF NOT EXISTS leaderboard(username, password, score INTEGER)");
+
+	console.log("Initialized database.");
 });
 
 const path = require("path");
