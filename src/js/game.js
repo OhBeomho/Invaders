@@ -143,9 +143,13 @@ class Player {
 
 		if (Player.#shootCooltime > 0) {
 			Player.#shootCooltime--;
-		} else if (Player.#shieldCooltime > 0) {
+		}
+
+		if (Player.#shieldCooltime > 0) {
 			Player.#shieldCooltime--;
-		} else if (Player.#hitCooltime > 0) {
+		}
+
+		if (Player.#hitCooltime > 0) {
 			Player.#hitCooltime--;
 		}
 
