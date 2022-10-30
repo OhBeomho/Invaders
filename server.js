@@ -3,17 +3,30 @@ const app = express();
 const http = require("http");
 const server = http.createServer(app);
 
-const sqlite = require("sqlite3").verbose();
-const db = new sqlite.Database(":memory:", sqlite.OPEN_READWRITE, (err) => {
+require("dotenv").config();
+
+const { Client } = require("pg");
+const { DB_HOST, DB_USER, DB_PASSWORD, DB_URL } = process.env;
+const db = new Client(DB_URL);
+db.connect((err) => {
 	if (err) {
-		console.error(err.message);
+		console.error("Database connection failed. Error: " + err.message);
 		return;
 	}
 
 	console.log("Connected to database.");
-	db.run("CREATE TABLE IF NOT EXISTS leaderboard(username, password, score INTEGER)");
 
-	console.log("Initialized database.");
+	db.query(
+		"CREATE TABLE IF NOT EXISTS leaderboard(username TEXT, password TEXT, score INTEGER)",
+		(err, _result) => {
+			if (err) {
+				console.error("Failed to initialize database. " + err.message);
+				return;
+			}
+
+			console.log("Initialized database.");
+		}
+	);
 });
 
 const path = require("path");
@@ -26,11 +39,13 @@ app.get("/", (_req, res) => res.sendFile(path.join(__dirname, "src", "index.html
 app.post("/score", (req, res) => {
 	const { score, username, password } = req.body;
 
-	db.get(`SELECT * FROM leaderboard WHERE username='${username}'`, (err, row) => {
+	db.query(`SELECT * FROM leaderboard WHERE username='${username}'`, (err, result) => {
 		if (err) {
-			res.send(JSON.stringify({ result: "ERROR" }));
+			res.sendStatus(500);
 			return;
 		}
+
+		const row = result.rows[0];
 
 		if (row) {
 			if (row.password !== password) {
@@ -43,18 +58,18 @@ app.post("/score", (req, res) => {
 				return;
 			}
 
-			db.run(`UPDATE leaderboard SET score=${score} WHERE username='${username}'`, (err) => {
+			db.query(`UPDATE leaderboard SET score=${score} WHERE username='${username}'`, (err, _result) => {
 				if (err) {
-					res.send(JSON.stringify({ result: "ERROR" }));
+					res.sendStatus(500);
 					return;
 				}
 
 				res.send(JSON.stringify({ result: "SUCCESS" }));
 			});
 		} else {
-			db.run(`INSERT INTO leaderboard VALUES('${username}', '${password}', ${score})`, (err) => {
+			db.query(`INSERT INTO leaderboard VALUES('${username}', '${password}', ${score})`, (err, _result) => {
 				if (err) {
-					res.send(JSON.stringify({ result: "ERROR" }));
+					res.sendStatus(500);
 					return;
 				}
 
@@ -66,12 +81,13 @@ app.post("/score", (req, res) => {
 app.post("/top", (req, res) => {
 	const { username } = req.body;
 
-	db.all("SELECT * FROM leaderboard ORDER BY score desc", (err, rows) => {
+	db.query("SELECT * FROM leaderboard ORDER BY score desc", (err, result) => {
 		if (err) {
-			res.send(JSON.stringify({ error: true }));
+			res.sendStatus(500);
 			return;
 		}
 
+		const rows = result.rows;
 		const top20 = rows.length > 20 ? rows.splice(0, 20) : rows;
 
 		const me = rows.find((row) => row.username === username);
@@ -83,20 +99,22 @@ app.post("/top", (req, res) => {
 app.post("/delete", (req, res) => {
 	const { username, password } = req.body;
 
-	db.get(`SELECT password FROM leaderboard WHERE username='${username}'`, (err, row) => {
+	db.query(`SELECT password FROM leaderboard WHERE username='${username}'`, (err, result) => {
 		if (err) {
-			res.send(JSON.stringify({ result: "ERROR" }));
+			res.sendStatus(500);
 			return;
 		}
+
+		const row = result.rows[0];
 
 		if (row) {
 			if (row.password !== password) {
 				res.send(JSON.stringify({ result: "INVALID_PASSWORD" }));
 				return;
 			} else {
-				db.run(`DELETE FROM leaderboard WHERE username='${username}'`, (err) => {
+				db.query(`DELETE FROM leaderboard WHERE username='${username}'`, (err, _result) => {
 					if (err) {
-						res.send(JSON.stringify({ result: "ERROR" }));
+						res.sendStatus(500);
 						return;
 					}
 

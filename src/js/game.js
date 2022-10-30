@@ -521,9 +521,9 @@ function saveRecord() {
 				alert("Password is incorrect.");
 			} else if (result === "NOT_SAVED") {
 				alert("We didn't saved your record.\nYour previous score is higher than current score.");
-			} else if (result === "ERROR") {
-				alert("An error occurred while saving your record.");
 			}
+		} else if (xhr.readyState === 4 && xhr.status === 500) {
+			alert("An error occurred while saving your record.");
 		}
 	};
 }

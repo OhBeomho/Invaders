@@ -124,12 +124,7 @@
 				xhr.onreadystatechange = () => {
 					if (xhr.readyState === 4 && xhr.status === 200) {
 						const response = JSON.parse(xhr.response);
-						const { top20, rank, score, error } = response;
-
-						if (error) {
-							alert("An error occurred while getting data.");
-							return;
-						}
+						const { top20, rank, score } = response;
 
 						leaderboard.innerHTML = "";
 
@@ -139,13 +134,17 @@
 							leaderboard.appendChild(userDiv);
 						}
 
-						document.querySelector(".leaderboard-div .rank").innerHTML = `Your score: ${score}<br />Your rank: ${rank}`;
+						document.querySelector(
+							".leaderboard-div .rank"
+						).innerHTML = `Your score: ${score}<br />Your rank: ${rank}`;
 
 						leaderboardDiv.style.display = "flex";
 						howDiv.style.display = "none";
 						keysDiv.style.display = "none";
 
 						currentUsername = username;
+					} else if (xhr.readyState === 4 && xhr.status === 500) {
+						alert("An error occurred while getting data.");
 					}
 				};
 			});
@@ -176,11 +175,11 @@
 							location.reload();
 						} else if (result === "INVALID_PASSWORD") {
 							alert("Password is incorrect.");
-						} else if (result === "ERROR") {
-							alert("An error occurred while deleting your record.");
 						} else if (result === "UNRANKED") {
 							alert("You didn't saved your record before.");
 						}
+					} else if (xhr.readyState === 4 && xhr.status === 500) {
+						alert("An error occurred while deleting your record.");
 					}
 				};
 			});
