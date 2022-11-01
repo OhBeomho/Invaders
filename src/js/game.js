@@ -31,7 +31,7 @@ class Player {
 	}
 
 	static get HIT_COOLTIME() {
-		return 100 / (60 / FPS);
+		return 130 / (60 / FPS);
 	}
 
 	static get life() {
