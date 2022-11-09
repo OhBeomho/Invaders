@@ -19,7 +19,7 @@ class Player {
 	}
 
 	static get SPEED() {
-		return 3.5 * (60 / FPS);
+		return (3.5 + Player.score / 10000) * (60 / FPS);
 	}
 
 	static get SHOOT_COOLTIME() {
@@ -230,6 +230,8 @@ class Invader {
 				objects.push(
 					new CircleEffect(this.x + Invader.WIDTH / 2, this.y + Invader.HEIGHT / 2, Invader.WIDTH, "green")
 				);
+
+				console.log(Player.SPEED);
 
 				return;
 			}
