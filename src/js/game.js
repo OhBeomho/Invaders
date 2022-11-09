@@ -231,8 +231,6 @@ class Invader {
 					new CircleEffect(this.x + Invader.WIDTH / 2, this.y + Invader.HEIGHT / 2, Invader.WIDTH, "green")
 				);
 
-				console.log(Player.SPEED);
-
 				return;
 			}
 		}
